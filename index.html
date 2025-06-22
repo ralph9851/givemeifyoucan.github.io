@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ฟอร์มบริจาคเสื้อผ้า</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>แบบฟอร์มบริจาคเสื้อผ้า</h1>
+    <form id="donationForm">
+      <label>ชื่อ-นามสกุล:</label>
+      <input type="text" name="name" required>
+
+      <label>อีเมล:</label>
+      <input type="email" name="email" required>
+
+      <label>ประเภทเสื้อผ้า:</label>
+      <select name="clothingType" required>
+        <option value="ชาย">ชาย</option>
+        <option value="หญิง">หญิง</option>
+        <option value="เด็ก">เด็ก</option>
+      </select>
+
+      <label>จำนวนชิ้น:</label>
+      <input type="number" name="quantity" min="1" required>
+
+      <button type="submit">ส่งข้อมูลบริจาค</button>
+    </form>
+
+    <div class="thank-you" id="thankYouMessage">
+      ✅ ขอบคุณสำหรับการบริจาคของคุณ!
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
+body {
+  font-family: sans-serif;
+  background-color: #f2f2f2;
+  padding: 50px;
+}
+
+.container {
+  max-width: 500px;
+  margin: auto;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #ccc;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+label {
+  margin-top: 15px;
+  display: block;
+  color: #333;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+.thank-you {
+  display: none;
+  text-align: center;
+  margin-top: 20px;
+  color: green;
+  font-weight: bold;
+}
+
+
+document.getElementById('donationForm').addEventListener('submit', function(e) {
+  e.preventDefault(); // ป้องกันการรีเฟรชหน้า
+
+  // แสดงข้อความขอบคุณ
+  document.getElementById('donationForm').style.display = 'none';
+  document.getElementById('thankYouMessage').style.display = 'block';
+
+  // หากต้องการส่งข้อมูลไปยังเซิร์ฟเวอร์หรือ Google Sheets สามารถเขียนที่นี่
+  // const formData = new FormData(this);
+  // fetch('YOUR_API_ENDPOINT', {
+  //   method: 'POST',
+  //   body: formData
+  // });
+});
+
