@@ -37,7 +37,6 @@ header{
 header h1{
   margin:0;
   font-weight:600;
-  letter-spacing:.5px;
 }
 
 header p{
@@ -66,12 +65,6 @@ header p{
   box-shadow:0 30px 80px rgba(0,0,0,.4);
 }
 
-.card h2{
-  margin-top:0;
-  font-size:18px;
-  font-weight:500;
-}
-
 label{
   font-size:13px;
   color:var(--muted);
@@ -86,10 +79,7 @@ input,select,textarea{
   background:rgba(255,255,255,.05);
   border:1px solid var(--border);
   color:var(--text);
-  outline:none;
 }
-
-textarea{resize:none}
 
 button{
   width:100%;
@@ -99,11 +89,8 @@ button{
   cursor:pointer;
   background:linear-gradient(135deg,#38bdf8,#6366f1);
   color:#020617;
-  font-size:15px;
   font-weight:600;
 }
-
-button:hover{opacity:.9}
 
 .ticket{
   display:grid;
@@ -116,30 +103,15 @@ button:hover{opacity:.9}
   margin-bottom:16px;
 }
 
-.ticket strong{
-  font-size:15px;
-}
-
-.ticket small{
-  color:var(--muted);
-}
-
 .badge{
-  display:inline-block;
   padding:4px 12px;
   border-radius:999px;
   font-size:12px;
-  margin-top:6px;
 }
 
 .open{background:rgba(248,113,113,.2);color:var(--red)}
 .progress{background:rgba(250,204,21,.2);color:var(--yellow)}
 .done{background:rgba(34,197,94,.2);color:var(--green)}
-
-.actions select{
-  padding:8px;
-  border-radius:12px;
-}
 
 @media(max-width:900px){
   .grid{grid-template-columns:1fr}
@@ -160,7 +132,6 @@ button:hover{opacity:.9}
     <!-- FORM -->
     <div class="card">
       <h2>แจ้งปัญหา</h2>
-
       <form id="ticketForm">
         <label>ชื่อผู้แจ้ง</label>
         <input id="reporter" required>
@@ -209,7 +180,7 @@ function render(){
           <small>ผู้แจ้ง: ${t.reporter}</small><br>
           <span class="badge ${t.statusClass}">${t.status}</span>
         </div>
-        <div class="actions">
+        <div>
           <select onchange="update(${i},this.value)">
             <option value="open">เปิด</option>
             <option value="progress">กำลังดำเนินการ</option>
@@ -240,23 +211,18 @@ form.onsubmit = e => {
     statusClass: "open"
   };
 
-  // บันทึก ticket
   tickets.unshift(ticket);
   localStorage.setItem("tickets", JSON.stringify(tickets));
   render();
 
-  // 📧 ส่งอีเมลแจ้งเตือนแอดมิน
-  fetch("https://script.google.com/macros/s/AKfycbwkA3TwRbseoINY6af5_Aht-hOW4_bc5hln1yOLpiulSXpjOX19CY9UVG37MFao_23W/exec", {
+  // 📧 ส่งอีเมลแจ้งเตือน
+  fetch("https://script.google.com/macros/s/AKfycbynOVuYcBkv08Lu5wMDVQ7FPTOn2_c8rG1spCY8pGCIkwkvEh6fEjtHiMrD-irtrs1q/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      reporter: ticket.reporter,
-      category: ticket.category,
-      problem: ticket.problem
-    })
+    body: JSON.stringify(ticket)
   })
-  .then(() => console.log("ส่งอีเมลแจ้งเตือนเรียบร้อย"))
-  .catch(err => console.error("ส่งอีเมลไม่สำเร็จ", err));
+  .then(()=>console.log("Email sent"))
+  .catch(err=>console.error(err));
 
   form.reset();
 };
