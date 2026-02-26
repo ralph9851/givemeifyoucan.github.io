@@ -14,7 +14,6 @@
   --border:rgba(255,255,255,.15);
   --text:#e5e7eb;
   --muted:#94a3b8;
-  --primary:#38bdf8;
   --green:#22c55e;
   --yellow:#facc15;
   --red:#f87171;
@@ -34,21 +33,10 @@ header{
   text-align:center;
 }
 
-header h1{
-  margin:0;
-  font-weight:600;
-}
+header h1{margin:0;font-weight:600}
+header p{color:var(--muted);margin-top:6px}
 
-header p{
-  color:var(--muted);
-  margin-top:6px;
-}
-
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:20px;
-}
+.container{max-width:1200px;margin:auto;padding:20px}
 
 .grid{
   display:grid;
@@ -62,13 +50,9 @@ header p{
   border:1px solid var(--border);
   border-radius:20px;
   padding:22px;
-  box-shadow:0 30px 80px rgba(0,0,0,.4);
 }
 
-label{
-  font-size:13px;
-  color:var(--muted);
-}
+label{font-size:13px;color:var(--muted)}
 
 input,select,textarea{
   width:100%;
@@ -129,7 +113,6 @@ button{
 <div class="container">
   <div class="grid">
 
-    <!-- FORM -->
     <div class="card">
       <h2>แจ้งปัญหา</h2>
       <form id="ticketForm">
@@ -151,7 +134,6 @@ button{
       </form>
     </div>
 
-    <!-- LIST -->
     <div class="card">
       <h2>รายการแจ้งปัญหา</h2>
       <div id="ticketList"></div>
@@ -215,14 +197,19 @@ form.onsubmit = e => {
   localStorage.setItem("tickets", JSON.stringify(tickets));
   render();
 
-  // 📧 ส่งอีเมลแจ้งเตือน
-  fetch("https://script.google.com/macros/s/AKfycbynOVuYcBkv08Lu5wMDVQ7FPTOn2_c8rG1spCY8pGCIkwkvEh6fEjtHiMrD-irtrs1q/exec", {
+  // 🔔 ส่งอีเมลแจ้งเตือน (ไม่บล็อกหน้าเว็บ)
+  fetch("https://script.google.com/macros/s/AKfycbx1bJ7gtnzkpAPzW_wzYfJEIm8AaKqmUw35rMcqC7Y8rG9_FyLw1x9sYLMBd5hHNn4e/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(ticket)
+    body: JSON.stringify({
+      reporter: ticket.reporter,
+      category: ticket.category,
+      problem: ticket.problem
+    })
   })
-  .then(()=>console.log("Email sent"))
-  .catch(err=>console.error(err));
+  .then(r => r.text())
+  .then(t => console.log("Mail response:", t))
+  .catch(err => console.error("Mail error:", err));
 
   form.reset();
 };
