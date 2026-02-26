@@ -1,114 +1,250 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ฟอร์มบริจาคเสื้อผ้า</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>IT Helpdesk</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+:root{
+  --bg:#0f172a;
+  --glass:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.15);
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --primary:#38bdf8;
+  --green:#22c55e;
+  --yellow:#facc15;
+  --red:#f87171;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:'Inter',system-ui;
+  background:radial-gradient(circle at top,#1e293b,#020617);
+  color:var(--text);
+}
+
+header{
+  padding:24px;
+  text-align:center;
+}
+
+header h1{
+  margin:0;
+  font-weight:600;
+  letter-spacing:.5px;
+}
+
+header p{
+  color:var(--muted);
+  margin-top:6px;
+}
+
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 2fr;
+  gap:24px;
+}
+
+.card{
+  background:var(--glass);
+  backdrop-filter:blur(14px);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.4);
+}
+
+.card h2{
+  margin-top:0;
+  font-size:18px;
+  font-weight:500;
+}
+
+label{
+  font-size:13px;
+  color:var(--muted);
+}
+
+input,select,textarea{
+  width:100%;
+  margin-top:6px;
+  margin-bottom:14px;
+  padding:12px;
+  border-radius:14px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  color:var(--text);
+  outline:none;
+}
+
+textarea{resize:none}
+
+button{
+  width:100%;
+  padding:14px;
+  border-radius:16px;
+  border:none;
+  cursor:pointer;
+  background:linear-gradient(135deg,#38bdf8,#6366f1);
+  color:#020617;
+  font-size:15px;
+  font-weight:600;
+}
+
+button:hover{opacity:.9}
+
+.ticket{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:14px;
+  padding:18px;
+  border-radius:18px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  margin-bottom:16px;
+}
+
+.ticket strong{
+  font-size:15px;
+}
+
+.ticket small{
+  color:var(--muted);
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 12px;
+  border-radius:999px;
+  font-size:12px;
+  margin-top:6px;
+}
+
+.open{background:rgba(248,113,113,.2);color:var(--red)}
+.progress{background:rgba(250,204,21,.2);color:var(--yellow)}
+.done{background:rgba(34,197,94,.2);color:var(--green)}
+
+.actions select{
+  padding:8px;
+  border-radius:12px;
+}
+
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr}
+}
+</style>
 </head>
+
 <body>
 
-  <div class="container">
-    <h1>แบบฟอร์มบริจาคเสื้อผ้า</h1>
-    <form id="donationForm">
-      <label>ชื่อ-นามสกุล:</label>
-      <input type="text" name="name" required>
+<header>
+  <h1>🛠 ระบบแจ้งปัญหาคอมพิวเตอร์</h1>
+  <p>IT Helpdesk & Service Request</p>
+</header>
 
-      <label>อีเมล:</label>
-      <input type="email" name="email" required>
+<div class="container">
+  <div class="grid">
 
-      <label>ประเภทเสื้อผ้า:</label>
-      <select name="clothingType" required>
-        <option value="ชาย">ชาย</option>
-        <option value="หญิง">หญิง</option>
-        <option value="เด็ก">เด็ก</option>
-      </select>
+    <!-- FORM -->
+    <div class="card">
+      <h2>แจ้งปัญหา</h2>
 
-      <label>จำนวนชิ้น:</label>
-      <input type="number" name="quantity" min="1" required>
+      <form id="ticketForm">
+        <label>ชื่อผู้แจ้ง</label>
+        <input id="reporter" required>
 
-      <button type="submit">ส่งข้อมูลบริจาค</button>
-    </form>
+        <label>ประเภทปัญหา</label>
+        <select id="category">
+          <option>ฮาร์ดแวร์</option>
+          <option>ซอฟต์แวร์</option>
+          <option>อินเทอร์เน็ต</option>
+          <option>ระบบเครือข่าย</option>
+        </select>
 
-    <div class="thank-you" id="thankYouMessage">
-      ✅ ขอบคุณสำหรับการบริจาคของคุณ!
+        <label>รายละเอียดปัญหา</label>
+        <textarea id="problem" rows="4" required></textarea>
+
+        <button type="submit">บันทึกคำขอ</button>
+      </form>
     </div>
-  </div>
 
-  <script src="script.js"></script>
+    <!-- LIST -->
+    <div class="card">
+      <h2>รายการแจ้งปัญหา</h2>
+      <div id="ticketList"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const form = document.getElementById("ticketForm");
+const reporter = document.getElementById("reporter");
+const category = document.getElementById("category");
+const problem = document.getElementById("problem");
+const list = document.getElementById("ticketList");
+
+let tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+
+function render(){
+  list.innerHTML="";
+  tickets.forEach((t,i)=>{
+    list.innerHTML+=`
+      <div class="ticket">
+        <div>
+          <strong>${t.category}</strong>
+          <div>${t.problem}</div>
+          <small>ผู้แจ้ง: ${t.reporter}</small><br>
+          <span class="badge ${t.statusClass}">${t.status}</span>
+        </div>
+        <div class="actions">
+          <select onchange="update(${i},this.value)">
+            <option value="open">เปิด</option>
+            <option value="progress">กำลังดำเนินการ</option>
+            <option value="done">เสร็จสิ้น</option>
+          </select>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function update(i,v){
+  if(v==="open"){tickets[i].status="เปิด";tickets[i].statusClass="open";}
+  if(v==="progress"){tickets[i].status="กำลังดำเนินการ";tickets[i].statusClass="progress";}
+  if(v==="done"){tickets[i].status="เสร็จสิ้น";tickets[i].statusClass="done";}
+  localStorage.setItem("tickets",JSON.stringify(tickets));
+  render();
+}
+
+form.onsubmit=e=>{
+  e.preventDefault();
+  tickets.unshift({
+    reporter: reporter.value,
+    category: category.value,
+    problem: problem.value,
+    status:"เปิด",
+    statusClass:"open"
+  });
+  localStorage.setItem("tickets",JSON.stringify(tickets));
+  form.reset();
+  render();
+}
+
+render();
+</script>
+
 </body>
 </html>
-
-
-
-body {
-  font-family: sans-serif;
-  background-color: #f2f2f2;
-  padding: 50px;
-}
-
-.container {
-  max-width: 500px;
-  margin: auto;
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px #ccc;
-}
-
-h1 {
-  text-align: center;
-  color: #333;
-}
-
-label {
-  margin-top: 15px;
-  display: block;
-  color: #333;
-}
-
-input, select, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-}
-
-button {
-  background-color: #28a745;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-button:hover {
-  background-color: #218838;
-}
-
-.thank-you {
-  display: none;
-  text-align: center;
-  margin-top: 20px;
-  color: green;
-  font-weight: bold;
-}
-
-
-document.getElementById('donationForm').addEventListener('submit', function(e) {
-  e.preventDefault(); // ป้องกันการรีเฟรชหน้า
-
-  // แสดงข้อความขอบคุณ
-  document.getElementById('donationForm').style.display = 'none';
-  document.getElementById('thankYouMessage').style.display = 'block';
-
-  // หากต้องการส่งข้อมูลไปยังเซิร์ฟเวอร์หรือ Google Sheets สามารถเขียนที่นี่
-  // const formData = new FormData(this);
-  // fetch('YOUR_API_ENDPOINT', {
-  //   method: 'POST',
-  //   body: formData
-  // });
-});
-
