@@ -229,19 +229,37 @@ function update(i,v){
   render();
 }
 
-form.onsubmit=e=>{
+form.onsubmit = e => {
   e.preventDefault();
-  tickets.unshift({
+
+  const ticket = {
     reporter: reporter.value,
     category: category.value,
     problem: problem.value,
-    status:"เปิด",
-    statusClass:"open"
-  });
-  localStorage.setItem("tickets",JSON.stringify(tickets));
-  form.reset();
+    status: "เปิด",
+    statusClass: "open"
+  };
+
+  // บันทึก ticket
+  tickets.unshift(ticket);
+  localStorage.setItem("tickets", JSON.stringify(tickets));
   render();
-}
+
+  // 📧 ส่งอีเมลแจ้งเตือนแอดมิน
+  fetch("https://script.google.com/macros/s/AKfycbwkA3TwRbseoINY6af5_Aht-hOW4_bc5hln1yOLpiulSXpjOX19CY9UVG37MFao_23W/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      reporter: ticket.reporter,
+      category: ticket.category,
+      problem: ticket.problem
+    })
+  })
+  .then(() => console.log("ส่งอีเมลแจ้งเตือนเรียบร้อย"))
+  .catch(err => console.error("ส่งอีเมลไม่สำเร็จ", err));
+
+  form.reset();
+};
 
 render();
 </script>
