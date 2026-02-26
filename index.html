@@ -164,9 +164,9 @@ function render(){
         </div>
         <div>
           <select onchange="update(${i},this.value)">
-            <option value="open">เปิด</option>
-            <option value="progress">กำลังดำเนินการ</option>
-            <option value="done">เสร็จสิ้น</option>
+            <option value="open" ${t.statusClass === 'open' ? 'selected' : ''}>เปิด</option>
+            <option value="progress" ${t.statusClass === 'progress' ? 'selected' : ''}>กำลังดำเนินการ</option>
+            <option value="done" ${t.statusClass === 'done' ? 'selected' : ''}>เสร็จสิ้น</option>
           </select>
         </div>
       </div>
@@ -197,11 +197,14 @@ form.onsubmit = e => {
   localStorage.setItem("tickets", JSON.stringify(tickets));
   render();
 
-  // 🔔 ส่งอีเมลแจ้งเตือน (ไม่บล็อกหน้าเว็บ)
+  // 🔔 ส่งอีเมลแจ้งเตือน (แก้ไขเรื่อง CORS โดยเปลี่ยนวิธีส่ง)
   fetch("https://script.google.com/macros/s/AKfycbyDXKsDNu0BYplviZMMzWy6fpVIccpAmn4sN_RTV1z0Czqg5d3FHYtwg3xXmHMjOKLS/exec", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
+    headers: { 
+        "Content-Type": "application/x-www-form-urlencoded" 
+    },
+    // แปลงข้อมูลเป็น URL Search Params เพื่อหลีกเลี่ยง CORS block ของ Google
+    body: new URLSearchParams({
       reporter: ticket.reporter,
       category: ticket.category,
       problem: ticket.problem
