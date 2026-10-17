@@ -2,191 +2,267 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>บันทึกประวัติวันลาส่วนตัว (ท้องถิ่น)</title>
-  <!-- Google Fonts: Sarabun -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>สมุดวันลาส่วนตัว • ท้องถิ่น</title>
+  
+  <!-- Fonts: Prompt & Sarabun -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Tailwind CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS & Font Awesome -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
   <!-- Vue 3 -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            display: ['Prompt', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body { font-family: 'Sarabun', sans-serif; }
     [v-cloak] { display: none; }
+    body { -webkit-tap-highlight-color: transparent; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen selection:bg-emerald-100 selection:text-emerald-800">
 
-  <div id="app" v-cloak class="max-w-3xl mx-auto p-4 md:p-6 pb-16">
-    
-    <!-- ส่วนหัว (Header & สลับปีงบ) -->
-    <header class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 mb-5">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div class="flex items-center gap-2 text-emerald-600 font-semibold text-xs mb-1">
-            <i class="fa-solid fa-file-lines"></i>
-            <span>สมุดบันทึกประวัติวันลา (พนักงานเทศบาล/อบต./อปท.)</span>
+  <div id="app" v-cloak class="max-w-xl mx-auto px-4 py-6 md:py-10">
+
+    <!-- Top Header -->
+    <header class="mb-6">
+      <div class="flex items-center justify-between gap-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
+            <i class="fa-solid fa-calendar-check text-lg"></i>
           </div>
-          <h1 class="text-xl md:text-2xl font-bold text-slate-800">ปีงบประมาณ พ.ศ. {{ selectedYear }}</h1>
-          <p class="text-xs text-slate-500 mt-0.5">รอบระยะเวลา: 1 ต.ค. {{ selectedYear - 1 }} – 30 ก.ย. {{ selectedYear }}</p>
+          <div>
+            <h1 class="font-display font-bold text-lg text-slate-900 leading-tight">สมุดวันลาส่วนตัว</h1>
+            <p class="text-xs text-slate-500">ข้าราชการ / พนักงานส่วนท้องถิ่น</p>
+          </div>
         </div>
-
-        <!-- ปุ่มสลับปีงบ 2570 - 2572 -->
-        <div class="flex items-center bg-slate-100 p-1.5 rounded-xl self-start sm:self-auto border border-slate-200">
-          <span class="text-xs font-medium text-slate-500 px-2">ปีงบ:</span>
-          <button 
-            v-for="year in availableYears" 
-            :key="year"
-            @click="selectedYear = year"
-            :class="selectedYear === year ? 'bg-white text-emerald-700 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-            class="px-3.5 py-1.5 rounded-lg text-sm transition-all duration-150">
-            {{ year }}
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <!-- การ์ดสรุปโควตาคงเหลือ 4 กล่อง -->
-    <section class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-      <!-- ลาพักผ่อน -->
-      <div class="bg-white rounded-2xl p-4 border border-emerald-100 shadow-sm">
-        <div class="text-xs font-semibold text-emerald-700 mb-1 flex items-center justify-between">
-          <span>ลาพักผ่อน</span>
-          <i class="fa-solid fa-umbrella-beach text-emerald-400"></i>
-        </div>
-        <div class="text-2xl font-black text-emerald-600">
-          {{ vacationRemaining }} <span class="text-xs font-normal text-slate-500">วัน</span>
-        </div>
-        <div class="text-[11px] text-slate-500 mt-1 flex justify-between border-t border-slate-100 pt-1">
-          <span>สิทธิ: {{ currentQuota.vacationTotal }}</span>
-          <span>ใช้: {{ vacationUsed }}</span>
-        </div>
-      </div>
-
-      <!-- ลากิจส่วนตัว -->
-      <div class="bg-white rounded-2xl p-4 border border-blue-100 shadow-sm">
-        <div class="text-xs font-semibold text-blue-700 mb-1 flex items-center justify-between">
-          <span>ลากิจส่วนตัว</span>
-          <i class="fa-regular fa-clipboard text-blue-400"></i>
-        </div>
-        <div class="text-2xl font-black text-blue-600">
-          {{ personalRemaining }} <span class="text-xs font-normal text-slate-500">วัน</span>
-        </div>
-        <div class="text-[11px] text-slate-500 mt-1 flex justify-between border-t border-slate-100 pt-1">
-          <span>สิทธิ: {{ currentQuota.personalMax }}</span>
-          <span>ใช้: {{ personalUsed }}</span>
-        </div>
-      </div>
-
-      <!-- ลาป่วย -->
-      <div class="bg-white rounded-2xl p-4 border border-rose-100 shadow-sm">
-        <div class="text-xs font-semibold text-rose-700 mb-1 flex items-center justify-between">
-          <span>ลาป่วย</span>
-          <i class="fa-solid fa-notes-medical text-rose-400"></i>
-        </div>
-        <div class="text-2xl font-black text-rose-600">
-          {{ sickRemaining }} <span class="text-xs font-normal text-slate-500">วัน</span>
-        </div>
-        <div class="text-[11px] text-slate-500 mt-1 flex justify-between border-t border-slate-100 pt-1">
-          <span>สิทธิ: {{ currentQuota.sickMax }}</span>
-          <span>ใช้: {{ sickUsed }}</span>
-        </div>
-      </div>
-
-      <!-- ลาอื่นๆ -->
-      <div class="bg-white rounded-2xl p-4 border border-purple-100 shadow-sm">
-        <div class="text-xs font-semibold text-purple-700 mb-1 flex items-center justify-between">
-          <span>ลาอื่นๆ</span>
-          <i class="fa-solid fa-circle-info text-purple-400"></i>
-        </div>
-        <div class="text-2xl font-black text-purple-600">
-          {{ otherUsed }} <span class="text-xs font-normal text-slate-500">วัน</span>
-        </div>
-        <div class="text-[11px] text-slate-500 mt-1 border-t border-slate-100 pt-1">
-          <span>คลอด/อุปสมบท/ศึกษา</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ตารางแสดงรายการวันลาทั้งหมดของปีงบประมาณที่เลือก -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-list-ul text-emerald-600"></i>
-          <span>รายการวันลาปีงบประมาณ {{ selectedYear }}</span>
-        </h2>
-        <span class="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
-          บันทึกแล้ว {{ currentYearLeaves.length }} ครั้ง
+        
+        <!-- Live Status Badge -->
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          ปีงบ {{ selectedYear }}
         </span>
       </div>
 
-      <!-- ถ้ายังไม่มีข้อมูล -->
-      <div v-if="currentYearLeaves.length === 0" class="text-center py-12 text-slate-400 text-xs">
-        <i class="fa-regular fa-folder-open text-3xl mb-2 text-slate-300 block"></i>
-        ไม่มีประวัติการลาในปีงบประมาณ {{ selectedYear }}
+      <!-- Segmented Year Switcher -->
+      <div class="bg-slate-200/70 p-1 rounded-2xl flex gap-1 shadow-inner">
+        <button 
+          v-for="year in availableYears" 
+          :key="year"
+          @click="selectedYear = year"
+          :class="selectedYear === year 
+            ? 'bg-white text-slate-900 shadow-sm font-semibold' 
+            : 'text-slate-600 hover:text-slate-900 font-normal'"
+          class="flex-1 py-2 rounded-xl text-xs md:text-sm transition-all duration-200 font-display flex flex-col items-center justify-center">
+          <span>ปีงบ {{ year }}</span>
+          <span class="text-[10px] opacity-60">1 ต.ค. {{ (year - 1).toString().slice(-2) }} – 30 ก.ย. {{ year.toString().slice(-2) }}</span>
+        </button>
       </div>
+    </header>
 
-      <!-- รายการข้อมูลวันลา -->
-      <div v-else class="divide-y divide-slate-100">
-        <div v-for="(item, index) in currentYearLeaves" :key="index" class="py-3 flex items-start justify-between gap-3">
-          <div class="flex items-start gap-3">
-            <span class="w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0" :class="getTypeBadge(item.type)"></span>
-            <div>
-              <div class="text-sm font-bold text-slate-800">
-                {{ item.type }}
-                <span class="text-xs font-semibold px-2 py-0.5 rounded-md ml-1.5" :class="getTypeTag(item.type)">
-                  {{ item.days }} วัน
-                </span>
-              </div>
-              <div class="text-xs text-slate-600 mt-0.5 flex items-center gap-1.5">
-                <i class="fa-regular fa-calendar text-[11px] text-slate-400"></i>
-                <span>{{ item.dateText }}</span>
-              </div>
-              <div v-if="item.reason" class="text-xs text-slate-400 mt-0.5">
-                เหตุผล: {{ item.reason }}
-              </div>
+    <!-- Quota Cards Grid -->
+    <section class="grid grid-cols-2 gap-3 mb-6">
+      
+      <!-- 1. ลาพักผ่อน (Hero Card) -->
+      <div class="col-span-2 bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950 text-white rounded-3xl p-5 shadow-xl shadow-slate-900/10 relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 text-white/[0.04] text-9xl pointer-events-none">
+          <i class="fa-solid fa-umbrella-beach"></i>
+        </div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-3">
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <i class="fa-solid fa-umbrella-beach text-[11px]"></i> ลาพักผ่อนประจำปี
+            </span>
+            <span class="text-xs text-slate-300">สิทธิรวม {{ currentQuota.vacationTotal }} วัน</span>
+          </div>
+
+          <div class="flex items-baseline gap-2 mb-3">
+            <span class="font-display text-4xl font-black tracking-tight text-white">{{ vacationRemaining }}</span>
+            <span class="text-sm font-normal text-emerald-300">วันคงเหลือ</span>
+            <span class="text-xs text-slate-400 ml-auto">(ใช้ไป {{ vacationUsed }} วัน)</span>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="w-full bg-slate-800/80 rounded-full h-2 overflow-hidden border border-white/10">
+            <div 
+              class="bg-gradient-to-r from-emerald-400 to-teal-300 h-2 rounded-full transition-all duration-500" 
+              :style="{ width: `${vacationPercent}%` }">
             </div>
+          </div>
+          <div class="flex justify-between items-center text-[11px] text-slate-400 mt-2">
+            <span>ยกยอดมา: {{ currentQuota.vacationCarried }} วัน</span>
+            <span>สิทธิปีนี้: {{ currentQuota.vacationBase }} วัน</span>
           </div>
         </div>
       </div>
 
-      <!-- แถบสรุปรวมท้ายตาราง -->
-      <div v-if="currentYearLeaves.length > 0" class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500 font-medium">
-        <span>รวมวันลาที่ใช้จริงทั้งหมด:</span>
-        <span class="text-sm font-bold text-slate-700">{{ totalDaysUsed }} วัน</span>
+      <!-- 2. ลากิจส่วนตัว -->
+      <div class="bg-white rounded-3xl p-4 border border-slate-200/80 shadow-sm hover:border-indigo-200 transition">
+        <div class="flex items-center justify-between mb-2">
+          <div class="w-7 h-7 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs">
+            <i class="fa-regular fa-clipboard"></i>
+          </div>
+          <span class="text-[11px] font-medium text-slate-400">สิทธิ {{ currentQuota.personalMax }}</span>
+        </div>
+        <div class="text-xs font-semibold text-slate-600 mb-0.5">ลากิจส่วนตัว</div>
+        <div class="flex items-baseline gap-1">
+          <span class="font-display text-2xl font-bold text-slate-900">{{ personalRemaining }}</span>
+          <span class="text-[11px] text-slate-400">วันเหลือ</span>
+        </div>
+        <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <span class="text-slate-400">ใช้ไป</span>
+          <span class="font-medium text-indigo-600">{{ personalUsed }} วัน</span>
+        </div>
+      </div>
+
+      <!-- 3. ลาป่วย -->
+      <div class="bg-white rounded-3xl p-4 border border-slate-200/80 shadow-sm hover:border-rose-200 transition">
+        <div class="flex items-center justify-between mb-2">
+          <div class="w-7 h-7 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-notes-medical"></i>
+          </div>
+          <span class="text-[11px] font-medium text-slate-400">สิทธิ {{ currentQuota.sickMax }}</span>
+        </div>
+        <div class="text-xs font-semibold text-slate-600 mb-0.5">ลาป่วย</div>
+        <div class="flex items-baseline gap-1">
+          <span class="font-display text-2xl font-bold text-slate-900">{{ sickRemaining }}</span>
+          <span class="text-[11px] text-slate-400">วันเหลือ</span>
+        </div>
+        <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <span class="text-slate-400">ใช้ไป</span>
+          <span class="font-medium text-rose-600">{{ sickUsed }} วัน</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- History Section -->
+    <section class="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm mb-6">
+      
+      <!-- Filter Bar -->
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+        <div>
+          <h2 class="font-display font-bold text-sm text-slate-900">ประวัติการลาปี {{ selectedYear }}</h2>
+          <p class="text-[11px] text-slate-400">ใช้สิทธิรวม {{ totalDaysUsed }} วัน ({{ currentYearLeaves.length }} ครั้ง)</p>
+        </div>
+        
+        <!-- Filter Tabs -->
+        <div class="flex gap-1 overflow-x-auto text-xs">
+          <button 
+            @click="filterType = 'all'" 
+            :class="filterType === 'all' ? 'bg-slate-900 text-white font-medium' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+            class="px-2.5 py-1 rounded-lg transition text-[11px]">
+            ทั้งหมด
+          </button>
+          <button 
+            @click="filterType = 'ลาพักผ่อน'" 
+            :class="filterType === 'ลาพักผ่อน' ? 'bg-emerald-600 text-white font-medium' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+            class="px-2.5 py-1 rounded-lg transition text-[11px]">
+            พักผ่อน
+          </button>
+          <button 
+            @click="filterType = 'ลากิจส่วนตัว'" 
+            :class="filterType === 'ลากิจส่วนตัว' ? 'bg-indigo-600 text-white font-medium' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+            class="px-2.5 py-1 rounded-lg transition text-[11px]">
+            กิจ
+          </button>
+          <button 
+            @click="filterType = 'ลาป่วย'" 
+            :class="filterType === 'ลาป่วย' ? 'bg-rose-600 text-white font-medium' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+            class="px-2.5 py-1 rounded-lg transition text-[11px]">
+            ป่วย
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div v-if="filteredLeaves.length === 0" class="py-10 text-center">
+        <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2 text-lg">
+          <i class="fa-regular fa-calendar-xmark"></i>
+        </div>
+        <p class="text-xs font-medium text-slate-600">ไม่มีข้อมูลการลา</p>
+        <p class="text-[11px] text-slate-400 mt-0.5">ไม่พบรายการลาในปีงบนี้ หรือตามเงื่อนไขที่เลือก</p>
+      </div>
+
+      <!-- Leaves Timeline List -->
+      <div v-else class="space-y-3">
+        <div 
+          v-for="(item, idx) in filteredLeaves" 
+          :key="idx" 
+          class="p-3.5 rounded-2xl border border-slate-100 bg-slate-50/60 flex items-start justify-between gap-3 hover:bg-white hover:border-slate-200 transition duration-150">
+          
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs mt-0.5 shadow-sm" :class="getBadgeStyle(item.type)">
+              <i :class="getIcon(item.type)"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-800">{{ item.type }}</span>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md" :class="getTagStyle(item.type)">
+                  {{ item.days }} วัน
+                </span>
+              </div>
+              <div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1.5">
+                <i class="fa-regular fa-clock text-[10px] text-slate-400"></i>
+                <span>{{ item.dateText }}</span>
+              </div>
+              <p v-if="item.reason" class="text-xs text-slate-600 mt-1 bg-white/70 px-2.5 py-1 rounded-lg border border-slate-100 inline-block">
+                {{ item.reason }}
+              </p>
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
 
-    <!-- คำแนะนำการแก้ไขข้อมูล -->
-    <footer class="mt-6 text-center text-xs text-slate-400">
-      * แก้ไขหรือเพิ่มรายการวันลาได้โดยตรงที่ส่วน <code class="bg-slate-200 text-slate-700 px-1 py-0.5 rounded">leavesData</code> ภายในโค้ด HTML
-    </footer>
+    <!-- Bottom Guide Card -->
+    <div class="p-4 rounded-2xl bg-slate-100/80 border border-slate-200/80 text-center text-xs text-slate-500">
+      <p class="flex items-center justify-center gap-1.5 font-medium text-slate-600 mb-0.5">
+        <i class="fa-brands fa-github text-slate-700"></i> อัปเดตข้อมูลผ่านแอป GitHub
+      </p>
+      <p class="text-[11px] text-slate-400">แก้ไขอาเรย์ <code class="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700 font-mono">leavesData</code> ด้านล่างไฟล์เพื่อเพิ่มรายการ</p>
+    </div>
 
   </div>
 
+  <!-- App Script & Embed Data -->
   <script>
     // =========================================================================
-    // ⚙️ ส่วนที่ 1: ตั้งค่าโควตาสิทธิวันลาแต่ละปีงบประมาณ (แก้ไขตัวเลขตรงนี้ได้)
+    // ⚙️ ส่วนที่ 1: ตั้งค่าโควตาสิทธิการลา (แก้ไขตัวเลขได้ตามสิทธิของคุณ)
     // =========================================================================
     const quotasData = {
       2570: { 
-        vacationCarried: 10, // วันลาพักผ่อนยกยอดมาจากปีก่อน
-        vacationBase: 10,    // สิทธิลาพักผ่อนปีนี้ (ปกติ 10 วัน)
-        personalMax: 45,     // สิทธิลากิจส่วนตัว
-        sickMax: 60          // สิทธิลาป่วย
+        vacationCarried: 10, // วันสะสมยกมาจากปี 2569
+        vacationBase: 10,    // สิทธิลาพักผ่อนปี 2570
+        personalMax: 45,     // ลากิจส่วนตัว
+        sickMax: 60          // ลาป่วย
       },
       2571: { 
-        vacationCarried: 5, 
+        vacationCarried: 10, 
         vacationBase: 10, 
         personalMax: 45, 
         sickMax: 60 
       },
       2572: { 
-        vacationCarried: 0, 
+        vacationCarried: 10, 
         vacationBase: 10, 
         personalMax: 45, 
         sickMax: 60 
@@ -194,46 +270,157 @@
     };
 
     // =========================================================================
-    // 📝 ส่วนที่ 2: บันทึกรายการวันลา (เพิ่ม / ลบ / แก้ไข ข้อมูลของคุณตรงนี้ได้เลย)
+    // 📝 ส่วนที่ 2: บันทึกข้อมูลการลา (เพิ่ม / ลบ / แก้ไข แถวด้านล่างนี้ได้เลย)
     // =========================================================================
     const leavesData = [
-      // --- ตัวอย่างข้อมูล ปีงบประมาณ 2570 (1 ต.ค. 69 - 30 ก.ย. 70) ---
+      // --- ข้อมูลตัวอย่าง ปีงบ 2570 ---
       { 
         fiscalYear: 2570, 
         type: 'ลาพักผ่อน', 
         dateText: '23 - 24 ต.ค. 2569', 
         days: 2, 
-        reason: 'ไปธุระต่างจังหวัด' 
+        reason: 'ไปต่างจังหวัด' 
       },
       { 
         fiscalYear: 2570, 
         type: 'ลากิจส่วนตัว', 
         dateText: '14 พ.ย. 2569 (เช้า)', 
         days: 0.5, 
-        reason: 'ติดต่อธนาคาร' 
+        reason: 'ติดต่อธุระส่วนตัว' 
       },
       { 
         fiscalYear: 2570, 
         type: 'ลาป่วย', 
         dateText: '8 ธ.ค. 2569', 
         days: 1, 
-        reason: 'ไข้หวัด' 
+        reason: 'มีไข้ หวัด' 
       },
-
-      // --- ตัวอย่างข้อมูล ปีงบประมาณ 2571 (1 ต.ค. 70 - 30 ก.ย. 71) ---
+      
+      // --- ข้อมูลตัวอย่าง ปีงบ 2571 ---
       { 
         fiscalYear: 2571, 
         type: 'ลาพักผ่อน', 
-        dateText: '28 ธ.ค. 2570', 
-        days: 1, 
-        reason: 'พักผ่อนช่วงสิ้นปี' 
+        dateText: '28 - 29 ธ.ค. 2570', 
+        days: 2, 
+        reason: 'พักผ่อนสิ้นปี' 
       },
 
-      // --- ตัวอย่างข้อมูล ปีงบประมาณ 2572 (1 ต.ค. 71 - 30 ก.ย. 72) ---
-      // (ถ้ามีวันลาในปี 2572 สามารถพิมพ์ต่อแถวตรงนี้ได้เลย)
+      // --- ปีงบ 2572 (สามารถก๊อปปี้ไปวางต่อท้ายได้เลย) ---
     ];
 
     // =========================================================================
+    // 🚀 ส่วนระบบการคำนวณ (ไม่ต้องแก้ไข)
+    // =========================================================================
+    const { createApp, ref, computed } = Vue;
+
+    createApp({
+      setup() {
+        const availableYears = [2570, 2571, 2572];
+        const selectedYear = ref(2570);
+        const filterType = ref('all');
+
+        const currentQuota = computed(() => {
+          const q = quotasData[selectedYear.value] || { vacationCarried: 0, vacationBase: 10, personalMax: 45, sickMax: 60 };
+          return {
+            ...q,
+            vacationTotal: (Number(q.vacationCarried) || 0) + (Number(q.vacationBase) || 10)
+          };
+        });
+
+        const currentYearLeaves = computed(() => {
+          return leavesData.filter(item => item.fiscalYear === selectedYear.value);
+        });
+
+        const filteredLeaves = computed(() => {
+          if (filterType.value === 'all') return currentYearLeaves.value;
+          return currentYearLeaves.value.filter(item => item.type === filterType.value);
+        });
+
+        const vacationUsed = computed(() => {
+          return currentYearLeaves.value
+            .filter(l => l.type === 'ลาพักผ่อน')
+            .reduce((sum, l) => sum + Number(l.days), 0);
+        });
+
+        const vacationRemaining = computed(() => {
+          return Math.max(0, currentQuota.value.vacationTotal - vacationUsed.value);
+        });
+
+        const vacationPercent = computed(() => {
+          if (currentQuota.value.vacationTotal <= 0) return 0;
+          return Math.min(100, Math.round((vacationUsed.value / currentQuota.value.vacationTotal) * 100));
+        });
+
+        const personalUsed = computed(() => {
+          return currentYearLeaves.value
+            .filter(l => l.type === 'ลากิจส่วนตัว')
+            .reduce((sum, l) => sum + Number(l.days), 0);
+        });
+
+        const personalRemaining = computed(() => {
+          return Math.max(0, currentQuota.value.personalMax - personalUsed.value);
+        });
+
+        const sickUsed = computed(() => {
+          return currentYearLeaves.value
+            .filter(l => l.type === 'ลาป่วย')
+            .reduce((sum, l) => sum + Number(l.days), 0);
+        });
+
+        const sickRemaining = computed(() => {
+          return Math.max(0, currentQuota.value.sickMax - sickUsed.value);
+        });
+
+        const totalDaysUsed = computed(() => {
+          return currentYearLeaves.value.reduce((sum, l) => sum + Number(l.days), 0);
+        });
+
+        const getBadgeStyle = (type) => {
+          if (type === 'ลาพักผ่อน') return 'bg-emerald-500 text-white';
+          if (type === 'ลากิจส่วนตัว') return 'bg-indigo-500 text-white';
+          if (type === 'ลาป่วย') return 'bg-rose-500 text-white';
+          return 'bg-purple-500 text-white';
+        };
+
+        const getTagStyle = (type) => {
+          if (type === 'ลาพักผ่อน') return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+          if (type === 'ลากิจส่วนตัว') return 'bg-indigo-50 text-indigo-700 border border-indigo-200';
+          if (type === 'ลาป่วย') return 'bg-rose-50 text-rose-700 border border-rose-200';
+          return 'bg-purple-50 text-purple-700 border border-purple-200';
+        };
+
+        const getIcon = (type) => {
+          if (type === 'ลาพักผ่อน') return 'fa-solid fa-umbrella-beach';
+          if (type === 'ลากิจส่วนตัว') return 'fa-regular fa-clipboard';
+          if (type === 'ลาป่วย') return 'fa-solid fa-notes-medical';
+          return 'fa-solid fa-circle-info';
+        };
+
+        return {
+          availableYears,
+          selectedYear,
+          filterType,
+          currentQuota,
+          currentYearLeaves,
+          filteredLeaves,
+          vacationUsed,
+          vacationRemaining,
+          vacationPercent,
+          personalUsed,
+          personalRemaining,
+          sickUsed,
+          sickRemaining,
+          totalDaysUsed,
+          getBadgeStyle,
+          getTagStyle,
+          getIcon
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
+=================================
     // 🚀 ระบบประมวลผลและแสดงผล (ไม่ต้องแก้ไขส่วนนี้)
     // =========================================================================
     const { createApp, ref, computed } = Vue;
